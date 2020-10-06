@@ -1,0 +1,85 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: description
+node_types:
+  tosca.nodes.nfv.VNF8:
+    requirements:
+    - virtualLink1:
+        type: tosca.nodes.nfv.VL
+        required: true
+metadata:
+  template_name: free5GCSetup
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF8
+  node_templates:
+    VDU1:
+      type: tosca.nodes.nfv.VDU.Tacker
+      properties:
+        name: free5gc-ausf-VNF
+        image: stage3_cp
+        flavor: free5gc
+        availability_zone: nova
+        mgmt_driver: noop
+        key_name: free5gc
+        user_data_format: RAW
+        user_data: |
+          #!/bin/sh
+          cd /home/ubuntu/
+          echo "export GOPATH for bash shell"
+          export HOME=/home/ubuntu
+          export GOPATH=$HOME/go
+          export GOROOT=/usr/local/go
+          export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+          export GO111MODULE=off
+          
+          cd stage3
+          echo "configure AUSF"
+          cat > /home/ubuntu/stage3/config/ausfcfg.conf <<- EOM
+          info:
+            version: 1.0.0
+            description: AUSF initial local configuration
+          
+          configuration:
+            sbi:
+              scheme: https
+              ipv4Addr: 192.168.2.108
+              port: 29509
+            serviceNameList:
+              - nausf-auth
+            nrfUri: http://192.168.2.101:29510
+            plmnSupportList:
+              - mcc: 208
+                mnc: 93
+              - mcc: 123
+                mnc: 45
+            groupId: ausfGroup001
+          EOM
+          
+          #echo "initialize AUSF"
+          #go build -o bin/ausf -x src/ausf/ausf.go
+          
+          #echo "run AUSF"
+          #sudo ./bin/ausf
+    CP1:
+      type: tosca.nodes.nfv.CP.Tacker
+      properties:
+        ip_address: 192.168.2.108
+        management: true
+      requirements:
+      - virtualLink:
+          node: VL1
+      - virtualBinding:
+          node: VDU1
+    VL1:
+      type: tosca.nodes.nfv.VL
+      properties:
+        network_name: 5GC
+        vendor: Tacker
+    FIP1:
+      type: tosca.nodes.network.FloatingIP
+      properties:
+        floating_network: public
+        floating_ip_address: 172.24.4.108
+      requirements:
+      - link:
+          node: CP1

@@ -1,0 +1,108 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: description
+node_types:
+  tosca.nodes.nfv.VNF6:
+    requirements:
+    - virtualLink1:
+        type: tosca.nodes.nfv.VL
+        required: true
+metadata:
+  template_name: free5GCSetup
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF6
+  node_templates:
+    VDU1:
+      type: tosca.nodes.nfv.VDU.Tacker
+      properties:
+        name: free5gc-udm-VNF
+        image: stage3_cp
+        flavor: free5gc
+        availability_zone: nova
+        mgmt_driver: noop
+        key_name: free5gc
+        user_data_format: RAW
+        user_data: |
+          #!/bin/sh
+          cd /home/ubuntu/
+          echo "export GOPATH for bash shell"
+          export HOME=/home/ubuntu
+          export GOPATH=$HOME/go
+          export GOROOT=/usr/local/go
+          export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+          export GO111MODULE=off
+          
+          cd stage3
+          echo "configure UDM"
+          cat > /home/ubuntu/stage3/config/udmcfg.conf <<- EOM
+          info:
+            version: 1.0.0
+            description: UDM initial local configuration
+
+          configuration:
+            serviceNameList:
+              - nudm-sdm
+              - nudm-uecm
+              - nudm-ueau
+              - nudm-ee
+              - nudm-pp
+            sbi:
+              scheme: http
+              ipv4Addr: 192.168.2.106
+              port: 29503
+              tls:
+                log: free5gc/udmsslkey.log
+                pem: free5gc/support/TLS/udm.pem
+                key: free5gc/support/TLS/udm.key
+            
+            udrclient:
+              scheme: http
+              ipv4Addr: 192.168.2.238
+              port: 29504
+
+            nrfclient:
+              scheme: http
+              ipv4Addr: 192.168.2.101
+              port: 29510
+            nrfUri: http://192.168.2.101:29510
+
+            # test data set from TS33501-f60 Annex C.4
+            # udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+            # udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+            # udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+            # udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+            keys:
+              udmProfileAHNPublicKey: 5a8d38864820197c3394b92613b20b91633cbd897119273bf8e4a6f4eec0a650
+              udmProfileAHNPrivateKey: c53c22208b61860b06c62e5406a7b330c2b577aa5558981510d128247d38bd1d
+              udmProfileBHNPublicKey: 0472DA71976234CE833A6907425867B82E074D44EF907DFB4B3E21C1C2256EBCD15A7DED52FCBB097A4ED250E036C7B9C8C7004C4EEDC4F068CD7BF8D3F900E3B4
+              udmProfileBHNPrivateKey: F1AB1074477EBCC7F554EA1C5FC368B1616730155E0041AC447D6301975FECDA
+          EOM
+          
+          #echo "initialize UDM"
+          #go build -o bin/udm -x src/udm/udm.go
+          
+          #echo "run UDM"
+          #sudo ./bin/udm
+    CP1:
+      type: tosca.nodes.nfv.CP.Tacker
+      properties:
+        ip_address: 192.168.2.106
+        management: true
+      requirements:
+      - virtualLink:
+          node: VL1
+      - virtualBinding:
+          node: VDU1
+    VL1:
+      type: tosca.nodes.nfv.VL
+      properties:
+        network_name: 5GC
+        vendor: Tacker
+    FIP1:
+      type: tosca.nodes.network.FloatingIP
+      properties:
+        floating_network: public
+        floating_ip_address: 172.24.4.106
+      requirements:
+      - link:
+          node: CP1

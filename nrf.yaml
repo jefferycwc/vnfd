@@ -1,0 +1,86 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: description
+node_types:
+  tosca.nodes.nfv.VNF1:
+    requirements:
+    - virtualLink1:
+        type: tosca.nodes.nfv.VL
+        required: true
+metadata:
+  template_name: free5GCSetup
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF1
+  node_templates:
+    VDU1:
+      type: tosca.nodes.nfv.VDU.Tacker
+      properties:
+        name: free5gc-nrf-VNF
+        image: stage3_cp
+        flavor: free5gc
+        availability_zone: nova
+        mgmt_driver: noop
+        key_name: free5gc
+        user_data_format: RAW
+        user_data: |
+          #!/bin/sh
+          cd /home/ubuntu/
+          
+          echo "export GOPATH for bash shell"
+          export HOME=/home/ubuntu
+          export GOPATH=$HOME/go
+          export GOROOT=/usr/local/go
+          export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+          export GO111MODULE=off
+          
+          cd stage3
+          echo "configure NRF"
+          cat > /home/ubuntu/stage3/config/nrfcfg.conf <<- EOM
+          info:
+            version: 1.0.0
+            description: NRF initial local configuration
+          
+          configuration:
+            MongoDBName: "free5gc"
+            MongoDBUrl: "mongodb://192.168.2.110:27017"
+            DefaultServiceIP: 192.168.2.101
+            sbi:
+              scheme: http
+              ipv4Addr: 192.168.2.101
+              port: 29510
+            DefaultPlmnId:
+              mcc: "208"
+              mnc: "93"
+            serviceNameList:
+              - nnrf-nfm
+              - nnrf-disc
+          EOM
+          
+          #echo "initialize NRF"
+          #go build -o bin/nrf -x src/nrf/nrf.go
+          
+          #echo "run NRF"
+          #sudo ./bin/nrf
+    CP1:
+      type: tosca.nodes.nfv.CP.Tacker
+      properties:
+        ip_address: 192.168.2.101
+        management: true
+      requirements:
+      - virtualLink:
+          node: VL1
+      - virtualBinding:
+          node: VDU1
+    VL1:
+      type: tosca.nodes.nfv.VL
+      properties:
+        network_name: 5GC
+        vendor: Tacker
+    FIP1:
+      type: tosca.nodes.network.FloatingIP
+      properties:
+        floating_network: public
+        floating_ip_address: 172.24.4.101
+      requirements:
+      - link:
+          node: CP1

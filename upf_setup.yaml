@@ -1,0 +1,53 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: description
+node_types:
+  tosca.nodes.nfv.VNF20:
+    requirements:
+    - virtualLink1:
+        type: tosca.nodes.nfv.VL
+        required: true
+metadata:
+  template_name: free5GCSetup
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF20
+  node_templates:
+    VDU1:
+      type: tosca.nodes.nfv.VDU.Tacker
+      properties:
+        name: free5gc-upf-setup-VNF
+        image: Debian
+        flavor: free5gc
+        availability_zone: nova
+        mgmt_driver: noop
+        key_name: free5gc
+        user_data_format: RAW
+        user_data: |
+          #!/bin/sh
+          #sudo apt-get update
+          cd /home/debian/
+          wget --no-check-certificate -O shell.bash "https://drive.google.com/uc?export=download&id=1zWf5Nb6ixJ6KcpJs7JYhaznTeQOIefz4"
+          . /home/debian/shell.bash
+    CP1:
+      type: tosca.nodes.nfv.CP.Tacker
+      properties:
+        ip_address: 192.168.2.148
+        management: true
+      requirements:
+      - virtualLink:
+          node: VL1
+      - virtualBinding:
+          node: VDU1
+    VL1:
+      type: tosca.nodes.nfv.VL
+      properties:
+        network_name: 5GC
+        vendor: Tacker
+    FIP1:
+      type: tosca.nodes.network.FloatingIP
+      properties:
+        floating_network: public
+        floating_ip_address: 172.24.4.148
+      requirements:
+      - link:
+          node: CP1

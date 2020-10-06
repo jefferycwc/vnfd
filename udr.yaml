@@ -1,0 +1,84 @@
+tosca_definitions_version: tosca_simple_profile_for_nfv_1_0_0
+description: description
+node_types:
+  tosca.nodes.nfv.VNF4:
+    requirements:
+    - virtualLink1:
+        type: tosca.nodes.nfv.VL
+        required: true
+metadata:
+  template_name: free5GCSetup
+topology_template:
+  substitution_mappings:
+    node_type: tosca.nodes.nfv.VNF4
+  node_templates:
+    VDU1:
+      type: tosca.nodes.nfv.VDU.Tacker
+      properties:
+        name: free5gc-udr-VNF
+        image: stage3_cp
+        flavor: free5gc
+        availability_zone: nova
+        mgmt_driver: noop
+        key_name: free5gc
+        user_data_format: RAW
+        user_data: |
+          #!/bin/sh
+          cd /home/ubuntu/
+          echo "export GOPATH for bash shell"
+          export HOME=/home/ubuntu
+          export GOPATH=$HOME/go
+          export GOROOT=/usr/local/go
+          export PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+          export GO111MODULE=off
+          
+          cd stage3
+          echo "configure UDR"
+          cat > /home/ubuntu/stage3/config/udrcfg.conf <<- EOM
+          info:
+            version: 1.0.0
+            description: UDR initial local configuration
+          
+          configuration:
+            sbi:
+              scheme: http
+              ipv4Addr: 192.168.2.104
+              port: 29504
+              tls:
+                  log: free5gc/udrsslkey.log
+                  pem: free5gc/support/TLS/udr.pem
+                  key: free5gc/support/TLS/udr.key
+            mongodb:
+              name: free5gc
+              url: mongodb://192.168.2.110:27017
+            nrfUri: http://192.168.2.101:29510
+          EOM
+          
+          #echo "initialize UDR"
+          #go build -o bin/udr -x src/udr/udr.go
+          
+          #echo "run UDR"
+          #sudo ./bin/udr
+    CP1:
+      type: tosca.nodes.nfv.CP.Tacker
+      properties:
+        ip_address: 192.168.2.104
+        management: true
+      requirements:
+      - virtualLink:
+          node: VL1
+      - virtualBinding:
+          node: VDU1
+    VL1:
+      type: tosca.nodes.nfv.VL
+      properties:
+        network_name: 5GC
+        vendor: Tacker
+    FIP1:
+      type: tosca.nodes.network.FloatingIP
+      properties:
+        floating_network: public
+        floating_ip_address: 172.24.4.104
+      requirements:
+      - link:
+          node: CP1
