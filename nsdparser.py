@@ -289,7 +289,7 @@ class TackerAPI():
         get_vnf_list_result = get_vnf_list_response.json()
         get_vnf_list_result = get_vnf_list_result['vnfs']
         for i in range(len(get_vnf_list_result)): 
-            vnf_name[i] = get_vnf_list_result[i]['name']
+            vnf_name[i] = get_vnf_list_result[0]['name']
         for i in rnage(len(vnf_name)):
             print(vnf_name[i])
         #text = get_vnf_list_response.text
