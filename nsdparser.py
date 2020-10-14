@@ -292,7 +292,7 @@ class TackerAPI():
         for i in range(len(get_vnf_list_result)):
             print('i: {}'.format(i))
             print(get_vnf_list_result[i]['name'])
-            vnf_status.insert(get_vnf_list_result[i]['name'],get_vnf_list_result[i]['status'])
+            vnf_status[get_vnf_list_result[i]['name']] = get_vnf_list_result[i]['status']
             #vnf_name[i] = get_vnf_list_result[i]['name']
         print('nrf status: {}'.format(vnf_status['nrf']))
         #for i in rnage(len(vnf_name)):
