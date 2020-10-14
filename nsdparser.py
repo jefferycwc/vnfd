@@ -273,8 +273,8 @@ class TackerAPI():
                     "type":vnf_t,
                 }
             }
-	  node_templates.update(vnf_d)
-	  #print(vnf_d)
+        node_templates.update(vnf_d)
+        #print(vnf_d)
 	
         print(node_templates)
         return node_templates
