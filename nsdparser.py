@@ -147,7 +147,7 @@ class TackerAPI():
         tenant_id = self.get_project_id(self.TACKER_OS_PROJECT_NAME)
         vnfd_id = self.get_vnfd_id(vnfd_name)
         vnf_description = 'VNF:' + vnf_name
-            vim_id = self.get_vim_id(vim_name)
+        vim_id = self.get_vim_id(vim_name)
         vnf_body = {
                 'vnf': {
                     'name': vnf_name,
