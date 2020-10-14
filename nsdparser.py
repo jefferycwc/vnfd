@@ -285,7 +285,7 @@ class TackerAPI():
         headers = {'X-Auth-Token': token}
         get_vnf_list_response = requests.get(get_vnf_list_url, headers=headers)
         print("Get Tacker vnf list status: " + str(get_vnf_list_response.status_code))
-        vnf_status = []
+        vnf_status = {}
         get_vnf_list_result = get_vnf_list_response.json()
         get_vnf_list_result = get_vnf_list_result['vnfs']
         print('len: {}'.format(len(get_vnf_list_result)))
