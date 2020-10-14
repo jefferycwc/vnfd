@@ -197,7 +197,7 @@ class TackerAPI():
     def list_vim(self):
         get_vim_list_url = 'http://' + self.TACKER_IP + ':9890/v1.0/vims'
         token = self.get_token()
-	headers = {'X-Auth-Token': token}
+        headers = {'X-Auth-Token': token}
         get_vim_list_response = requests.get(get_vim_list_url, headers=headers)
         print("Get Tacker vim list status: " + str(get_vim_list_response.status_code))
         get_vim_list_result = get_vim_list_response.json()
@@ -220,7 +220,7 @@ class TackerAPI():
     def list_nsd(self):
         get_nsd_list_url = 'http://' + self.TACKER_IP + ':9890/v1.0/nsds'
         token = self.get_token()
-	headers = {'X-Auth-Token': token}
+        headers = {'X-Auth-Token': token}
         get_nsd_list_response = requests.get(get_nsd_list_url, headers=headers)
         print("Get Tacker nsd list status: " + str(get_nsd_list_response.status_code))
         get_nsd_list_result = get_nsd_list_response.json()
@@ -243,7 +243,7 @@ class TackerAPI():
     def list_vnfd(self):
         get_vnfd_list_url = 'http://' + self.TACKER_IP + ':9890/v1.0/vnfds'
         token = self.get_token()
-	headers = {'X-Auth-Token': token}
+        headers = {'X-Auth-Token': token}
         get_vnfd_list_response = requests.get(get_vnfd_list_url, headers=headers)
         print("Get Tacker vnfd list status: " + str(get_vnfd_list_response.status_code))
         get_vnfd_list_result = get_vnfd_list_response.json()
@@ -266,17 +266,17 @@ class TackerAPI():
     def generate_node_templates(self, number_of_vnf):
         node_templates = {}
         for i in range(number_of_vnf):
-	  vnf_s = "VNF" + str(i+1)
-          vnf_t = "tosca.nodes.nfv.VNF" + str(i+1)
-	  vnf_d = {
-	    vnf_s: {
-		"type":vnf_t,
-	    }
-	  }
+            vnf_s = "VNF" + str(i+1)
+            vnf_t = "tosca.nodes.nfv.VNF" + str(i+1)
+            vnf_d = {
+                vnf_s: {
+                    "type":vnf_t,
+                }
+            }
 	  node_templates.update(vnf_d)
 	  #print(vnf_d)
 	
-	print(node_templates)
+        print(node_templates)
         return node_templates
 
     def list_vnf(self):
