@@ -287,7 +287,7 @@ class TackerAPI():
         print("Get Tacker vnf list status: " + str(get_vnf_list_response.status_code))
         get_vnf_list_result = get_vnf_list_response.json()
         nrf_name = get_vnf_list_result['vnfs'][0]['name']
-        printf(nrf_name)
+        print(nrf_name)
         #text = get_vnf_list_response.text
         print(get_vnf_list_result)
         #print(text)
