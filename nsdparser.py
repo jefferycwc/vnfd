@@ -143,19 +143,19 @@ class TackerAPI():
     def create_vnf(self, vnf_name, vnfd_name, vim_name):
         post_create_vnf_url = 'http://' + self.TACKER_IP + ':9890/v1.0/vnfs'
         token = self.get_token()
-	headers = {'X-Auth-Token': token}
-	tenant_id = self.get_project_id(self.TACKER_OS_PROJECT_NAME)
-	vnfd_id = self.get_vnfd_id(vnfd_name)
-	vnf_description = 'VNF:' + vnf_name
-        vim_id = self.get_vim_id(vim_name)
-	vnf_body = {
-            'vnf': {
-                'name': vnf_name,
-                'description': vnf_description,
-                'tenant_id': tenant_id,
-                'vnfd_id': vnfd_id,
-                'vim_id': vim_id,
-            }
+        headers = {'X-Auth-Token': token}
+        tenant_id = self.get_project_id(self.TACKER_OS_PROJECT_NAME)
+        vnfd_id = self.get_vnfd_id(vnfd_name)
+        vnf_description = 'VNF:' + vnf_name
+            vim_id = self.get_vim_id(vim_name)
+        vnf_body = {
+                'vnf': {
+                    'name': vnf_name,
+                    'description': vnf_description,
+                    'tenant_id': tenant_id,
+                    'vnfd_id': vnfd_id,
+                    'vim_id': vim_id,
+                }
         }
 	
 	#print(nsd_body)
@@ -286,7 +286,7 @@ class TackerAPI():
         get_vnf_list_response = requests.get(get_vnf_list_url, headers=headers)
         print("Get Tacker vnf list status: " + str(get_vnf_list_response.status_code))
         get_vnf_list_result = get_vnf_list_response.json()
-        nrf_name = get_vnf_list_result[0]['name']
+        nrf_name = get_vnf_list_result['vnf']['name']
         printf(nrf_name)
         #text = get_vnf_list_response.text
         print(get_vnf_list_result)
