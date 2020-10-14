@@ -294,7 +294,7 @@ class TackerAPI():
     def list_ns(self):
         get_ns_list_url = 'http://' + self.TACKER_IP + ':9890/v1.0/nss'
         token = self.get_token()
-	    headers = {'X-Auth-Token': token}
+        headers = {'X-Auth-Token': token}
         get_ns_list_response = requests.get(get_ns_list_url, headers=headers)
         print("Get Tacker ns list status: " + str(get_ns_list_response.status_code))
         get_ns_list_result = get_ns_list_response.json()
