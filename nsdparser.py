@@ -288,7 +288,7 @@ class TackerAPI():
         vnf_name = []
         get_vnf_list_result = get_vnf_list_response.json()
         get_vnf_list_result = get_vnf_list_result['vnfs']
-        printf('len: {}'.format(len(get_vnf_list_result)))
+        print('len: {}'.format(len(get_vnf_list_result)))
         for i in range(len(get_vnf_list_result)): 
             vnf_name[i] = get_vnf_list_result[i]['name']
         for i in rnage(len(vnf_name)):
