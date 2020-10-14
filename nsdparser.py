@@ -282,7 +282,7 @@ class TackerAPI():
     def list_vnf(self):
         get_vnf_list_url = 'http://' + self.TACKER_IP + ':9890/v1.0/vnfs'
         token = self.get_token()
-	headers = {'X-Auth-Token': token}
+	    headers = {'X-Auth-Token': token}
         get_vnf_list_response = requests.get(get_vnf_list_url, headers=headers)
         print("Get Tacker vnf list status: " + str(get_vnf_list_response.status_code))
         get_vnf_list_result = get_vnf_list_response.json()
@@ -294,7 +294,7 @@ class TackerAPI():
     def list_ns(self):
         get_ns_list_url = 'http://' + self.TACKER_IP + ':9890/v1.0/nss'
         token = self.get_token()
-	headers = {'X-Auth-Token': token}
+	    headers = {'X-Auth-Token': token}
         get_ns_list_response = requests.get(get_ns_list_url, headers=headers)
         print("Get Tacker ns list status: " + str(get_ns_list_response.status_code))
         get_ns_list_result = get_ns_list_response.json()
@@ -639,7 +639,10 @@ def initiate_ns(file_name, nsd_name, vim_name):
 
 if __name__ == '__main__':
     print('start')
-    initiate_ns("k8s_nsd.yaml","om2m_k8s_NS","Kubernetes_Site")
+    test = TackerAPI()
+    test.list_vnf()
+    #get_vnf_status()
+    #initiate_ns("k8s_nsd.yaml","om2m_k8s_NS","Kubernetes_Site")
     #initiate_ns("iottalk_nsd.yaml","IoTtalk_NS","OpenStack_Site")
     
     #test = OpenStackAPI()

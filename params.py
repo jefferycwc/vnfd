@@ -1,5 +1,5 @@
-OPENSTACK_IP='192.168.1.134'
-OS_AUTH_URL='http://192.168.1.134/identity'
+OPENSTACK_IP='192.168.1.77'
+OS_AUTH_URL='http://192.168.1.77/identity'
 OS_USER_DOMAIN_NAME = 'Default'
 OS_USERNAME = 'admin'
 OS_PASSWORD = 'secret'
