@@ -1,0 +1,9 @@
+auth_url: 'http://192.168.1.77/identity'
+username: 'admin'
+password: 'secret'
+project_name: 'admin'
+project_domain_name: 'Default'
+user_domain_name: 'Default'
+cert_verify: 'False'
+~                                                                                                       
+~                          
